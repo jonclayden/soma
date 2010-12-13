@@ -2,7 +2,7 @@
 \alias{soma}
 \title{The Self-Organising Migrating Algorithm}
 \description{
-The Self-Organising Migrating Algorithm is a general-purpose, stochastic optimisation algorithm. The approach is similar to that of genetic algorithms, although it is based on the idea of a series of ``migrations'' by a fixed set of individuals, rather than the development of successive generations. It can be applied to any cost-minimisation problem with a finite parameter space, and is robust to local minima.
+The Self-Organising Migrating Algorithm is a general-purpose, stochastic optimisation algorithm. The approach is similar to that of genetic algorithms, although it is based on the idea of a series of ``migrations'' by a fixed set of individuals, rather than the development of successive generations. It can be applied to any cost-minimisation problem with a bounded parameter space, and is robust to local minima.
 }
 \usage{
 soma(costFunction, bounds, options = list(), strategy = "all2one", ...)

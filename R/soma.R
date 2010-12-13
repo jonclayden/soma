@@ -1,11 +1,11 @@
 soma <- function (costFunction, bounds, options = list(), strategy = "all2one", ...)
 {
     if (!(all(c("min","max") %in% names(bounds))))
-        output(OL$Error, "Bounds list must contain \"min\" and \"max\" vector elements")
+        report(OL$Error, "Bounds list must contain \"min\" and \"max\" vector elements")
     if (length(bounds$min) != length(bounds$max))
-        output(OL$Error, "Bounds are not of equal length")
+        report(OL$Error, "Bounds are not of equal length")
     if (strategy != "all2one")
-        output(OL$Error, "Only the \"all2one\" strategy is currently supported")
+        report(OL$Error, "Only the \"all2one\" strategy is currently supported")
     
     # Use defaults for unspecified options
     defaultOptions <- list(pathLength=3, stepLength=0.11, perturbationChance=0.1, minAbsoluteSep=0, minRelativeSep=1e-3, nMigrations=20, populationSize=10)
@@ -39,18 +39,18 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
         # Check termination criteria
         if (migrationCount == options$nMigrations)
         {
-            output(OL$Info, "Migration limit (", options$nMigrations, ") reached - stopping")
+            report(OL$Info, "Migration limit (", options$nMigrations, ") reached - stopping")
             break
         }
         if (separationOfExtremes < options$minAbsoluteSep)
         {
-            output(OL$Info, "Absolute cost separation (", signif(separationOfExtremes,3), ") is below threshold (", signif(options$minAbsoluteSep,3), ") - stopping")
+            report(OL$Info, "Absolute cost separation (", signif(separationOfExtremes,3), ") is below threshold (", signif(options$minAbsoluteSep,3), ") - stopping")
             break
         }
         # isTRUE() needed here in case extremes are infinite: Inf/Inf => NaN
         if (isTRUE(separationOfExtremes/sumOfExtremes < options$minRelativeSep))
         {
-            output(OL$Info, "Relative cost separation (", signif(separationOfExtremes/sumOfExtremes,3), ") is below threshold (", signif(options$minRelativeSep,3), ") - stopping")
+            report(OL$Info, "Relative cost separation (", signif(separationOfExtremes/sumOfExtremes,3), ") is below threshold (", signif(options$minRelativeSep,3), ") - stopping")
             break
         }
         
@@ -80,10 +80,10 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
         
         migrationCount <- migrationCount + 1
         if (migrationCount %% 10 == 0)
-            output(OL$Verbose, "Completed ", migrationCount, " migrations")
+            report(OL$Verbose, "Completed ", migrationCount, " migrations")
     }
     
-    output(OL$Info, "Leader is #", leaderIndex, ", with cost ", signif(costFunctionValues[leaderIndex],3))
+    report(OL$Info, "Leader is #", leaderIndex, ", with cost ", signif(costFunctionValues[leaderIndex],3))
     
     returnValue <- list(leader=leaderIndex, population=population, cost=costFunctionValues, history=leaderCostHistory, migrations=migrationCount)
     class(returnValue) <- "soma"
