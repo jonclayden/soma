@@ -22,13 +22,17 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
     population <- matrix(runif(nParamsTotal), nrow=nParams, ncol=options$populationSize)
     population <- population * (bounds$max-bounds$min) + bounds$min
     
+    # Calculate initial costs
+    costFunctionValues <- apply(population, 2, costFunction, ...)
+    
     migrationCount <- 0
     leaderCostHistory <- numeric(0)
     
+    report(OL$Info, "Starting SOMA optimisation")
+    
     repeat
     {
-        # Values over actual locations
-        costFunctionValues <- apply(population, 2, costFunction, ...)
+        # Find the current leader
         leaderIndex <- which.min(costFunctionValues)
         leaderValue <- costFunctionValues[leaderIndex]
         separationOfExtremes <- max(costFunctionValues) - leaderValue
@@ -74,9 +78,10 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
         costFunctionValues <- apply(populationSteps, 2:3, costFunction, ...)
         individualBestLocs <- apply(costFunctionValues, 1, which.min)
         
-        # Migrate each individual to its best new location
+        # Migrate each individual to its best new location, and update costs
         indexingMatrix <- cbind(seq_len(options$populationSize), individualBestLocs)
         population <- t(apply(populationSteps, 1, "[", indexingMatrix))
+        costFunctionValues <- costFunctionValues[indexingMatrix]
         
         migrationCount <- migrationCount + 1
         if (migrationCount %% 10 == 0)
