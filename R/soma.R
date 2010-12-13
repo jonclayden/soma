@@ -7,6 +7,7 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
     if (strategy != "all2one")
         output(OL$Error, "Only the \"all2one\" strategy is currently supported")
     
+    # Use defaults for unspecified options
     defaultOptions <- list(pathLength=3, stepLength=0.11, perturbationChance=0.1, minAbsoluteSep=0, minRelativeSep=1e-3, nMigrations=20, populationSize=10)
     defaultsNeeded <- setdiff(names(defaultOptions), names(options))
     options[defaultsNeeded] <- defaultOptions[defaultsNeeded]
@@ -17,6 +18,7 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
     nSteps <- length(steps)
     steps <- rep(steps, each=nParamsTotal)
     
+    # Create the population
     population <- matrix(runif(nParamsTotal), nrow=nParams, ncol=options$populationSize)
     population <- population * (bounds$max-bounds$min) + bounds$min
     
@@ -45,19 +47,24 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
             output(OL$Info, "Absolute cost separation (", signif(separationOfExtremes,3), ") is below threshold (", signif(options$minAbsoluteSep,3), ") - stopping")
             break
         }
-        if (separationOfExtremes/sumOfExtremes < options$minRelativeSep)
+        # isTRUE() needed here in case extremes are infinite: Inf/Inf => NaN
+        if (isTRUE(separationOfExtremes/sumOfExtremes < options$minRelativeSep))
         {
             output(OL$Info, "Relative cost separation (", signif(separationOfExtremes/sumOfExtremes,3), ") is below threshold (", signif(options$minRelativeSep,3), ") - stopping")
             break
         }
         
+        # Find the migration direction for each individual
         directionsFromLeader <- apply(population, 2, "-", population[,leaderIndex])
+        
+        # Establish which parameters will be changed
         toPerturb <- runif(nParamsTotal) < options$perturbationChance
         
         # Second line here has a minus because directions are away from leader
         populationSteps <- array(rep(population,nSteps), dim=c(nParams,options$populationSize,nSteps))
         populationSteps <- populationSteps - steps * rep(directionsFromLeader * toPerturb, nSteps)
         
+        # Replace out-of-bounds parameters with random valid values
         outOfBounds <- which(populationSteps < bounds$min | populationSteps > bounds$max)
         randomSteps <- array(runif(nParamsTotal*nSteps), dim=c(nParams,options$populationSize,nSteps))
         randomSteps <- randomSteps * (bounds$max-bounds$min) + bounds$min
@@ -67,6 +74,7 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
         costFunctionValues <- apply(populationSteps, 2:3, costFunction, ...)
         individualBestLocs <- apply(costFunctionValues, 1, which.min)
         
+        # Migrate each individual to its best new location
         indexingMatrix <- cbind(seq_len(options$populationSize), individualBestLocs)
         population <- t(apply(populationSteps, 1, "[", indexingMatrix))
         
