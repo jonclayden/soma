@@ -10,7 +10,10 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
     # Use defaults for unspecified options
     defaultOptions <- list(pathLength=3, stepLength=0.11, perturbationChance=0.1, minAbsoluteSep=0, minRelativeSep=1e-3, nMigrations=20, populationSize=10)
     defaultsNeeded <- setdiff(names(defaultOptions), names(options))
+    spuriousOptions <- setdiff(names(options), names(defaultOptions))
     options[defaultsNeeded] <- defaultOptions[defaultsNeeded]
+    if (length(spuriousOptions) > 0)
+        report(OL$Warning, "The following options were specified but are not used: ", paste(spuriousOptions,collapse=", "))
     
     nParams <- length(bounds$min)
     nParamsTotal <- nParams * options$populationSize
