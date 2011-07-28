@@ -1,0 +1,4 @@
+import(reportr)
+
+export(soma)
+S3method(plot, soma)
