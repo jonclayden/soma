@@ -98,3 +98,8 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
     
     return (returnValue)
 }
+
+plot.soma <- function (x, y = NULL, ...)
+{
+    plot(seq_along(x$history), x$history, xlab="Migration number", ylab="Leader cost value", type="b", ...)
+}

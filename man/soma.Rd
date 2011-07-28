@@ -1,18 +1,23 @@
 \name{soma}
 \alias{soma}
+\alias{plot.soma}
 \title{The Self-Organising Migrating Algorithm}
 \description{
 The Self-Organising Migrating Algorithm is a general-purpose, stochastic optimisation algorithm. The approach is similar to that of genetic algorithms, although it is based on the idea of a series of ``migrations'' by a fixed set of individuals, rather than the development of successive generations. It can be applied to any cost-minimisation problem with a bounded parameter space, and is robust to local minima.
 }
 \usage{
 soma(costFunction, bounds, options = list(), strategy = "all2one", ...)
+
+\method{plot}{soma}(x, y = NULL, ...)
 }
 \arguments{
   \item{costFunction}{A cost function which takes a numeric vector of parameters as its first argument, and returns a numeric scalar representing the associated cost value.}
   \item{bounds}{A list with elements \code{min} and \code{max}, each a numeric vector giving the upper and lower bounds for each parameter, respectively.}
   \item{options}{A list of options for the SOMA algorithm itself. See Details.}
   \item{strategy}{The strategy type to use. Currently \code{"all2one"} is the only supported value.}
-  \item{\dots}{Additional parameters to \code{costFunction}.}
+  \item{\dots}{Additional parameters to \code{costFunction}, or to \code{\link{plot}}.}
+  \item{x}{An object of class \code{"soma"}.}
+  \item{y}{Ignored.}
 }
 \details{
 A number of options are available to adjust the behaviour of the optimisation, and its termination criteria. The default values used here are recommended by Zelinka (2004).
@@ -33,6 +38,7 @@ A list of class \code{"soma"}, containing the following elements.
   \item{cost}{A vector giving the cost function values for each individual at convergence.}
   \item{history}{A vector giving the cost of the leader for each migration during the optimisation. This should be nonincreasing.}
   \item{migrations}{The number of migrations completed.}
+A \code{\link{plot}} method is available for this class, which shows the history of leader cost values during the optimisation.
 }
 \references{
 I. Zelinka (2004). SOMA - self-organizing migrating algorithm. In G.C. Onwubolu & B.V. Babu, eds, New optimization techniques in engineering. Volume 141 of ``Studies in Fuzziness and Soft Computing'', pp. 167-217. Springer.
@@ -48,4 +54,7 @@ x <- soma(rastrigin, list(min=c(-5,-5),max=c(5,5)))
 
 # Find the location of the leader - should be near the true minimum of c(0,0)
 print(x$population[,x$leader])
+
+# Plot the cost history of the leaders
+plot(x)
 }
