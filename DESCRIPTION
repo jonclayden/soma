@@ -1,10 +1,11 @@
 Package: soma
-Version: 1.0.0
-Date: 2010-12-13
+Version: 1.1.0
+Date: 2011-07-28
 Title: General-purpose optimisation with the Self-Organising Migrating Algorithm
 Author: Jon Clayden; based on the work of Ivan Zelinka
 Maintainer: Jon Clayden <jon.clayden+soma@gmail.com>
-Depends: R (>= 2.5.0), reportr
+Depends: R (>= 2.5.0)
+Imports: reportr
 Description: This package provides an R implementation of the Self-Organising Migrating Algorithm, a general-purpose, stochastic optimisation algorithm. The approach is similar to that of genetic algorithms, although it is based on the idea of a series of ``migrations'' by a fixed set of individuals, rather than the development of successive generations. It can be applied to any cost-minimisation problem with a bounded parameter space, and is robust to local minima.
 License: GPL-2
 URL: http://www.ft.utb.cz/people/zelinka/soma/
