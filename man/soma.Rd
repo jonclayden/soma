@@ -23,7 +23,7 @@ soma(costFunction, bounds, options = list(), strategy = "all2one", ...)
 A number of options are available to adjust the behaviour of the optimisation, and its termination criteria. The default values used here are recommended by Zelinka (2004).
   \describe{
     \item{pathLength:}{The distance towards the leader that individuals may migrate. A value of 1 corresponds to the leader's position itself, and values greater than one (recommended) allow for some overshoot. The default is 3.}
-    \item{stepLength:}{The granularity at which potential steps are evaluated. It is recommended that this not be a whole multiple of the \code{pathLength}. The default is 0.11.}
+    \item{stepLength:}{The granularity at which potential steps are evaluated. It is recommended that the \code{pathLength} not be a whole multiple of this value. The default is 0.11.}
     \item{perturbationChance:}{The probability that individual parameters are changed on any given step. The default is 0.1.}
     \item{minAbsoluteSep:}{The smallest absolute difference between the maximum and minimum cost function values. If the difference falls below this minimum, the algorithm will terminate. The default is 0, meaning that this termination criterion will never be met.}
     \item{minRelativeSep:}{The smallest relative difference between the maximum and minimum cost function values. If the difference falls below this minimum, the algorithm will terminate. The default is 0.001.}
