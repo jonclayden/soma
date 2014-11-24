@@ -2,6 +2,13 @@ Significant changes to the soma package are laid out below for each release.
 
 =================================================================================
 
+VERSION 1.1.1
+
+- A short README file has been added to the package.
+- The LICENCE file is no longer needed and has been removed.
+
+=================================================================================
+
 VERSION 1.1.0
 
 - A plot function has been added for "soma" objects, which shows the history of
