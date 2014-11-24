@@ -42,6 +42,8 @@ plot(x)
 
 ![SOMA progress](http://www.clayden.org/files/soma/soma_progress.png)
 
+We observe that there is an initial, rapid decrease in the cost function value of the "leader"—the individual with the lowest value—followed by further, smaller steps downwards towards zero as the algorithm progresses.
+
 ## Options
 
 The supported options are as follows. The defaults are as recommended in the reference below.
