@@ -53,7 +53,7 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
             break
         }
         # isTRUE() needed here in case extremes are infinite: Inf/Inf => NaN
-        if (isTRUE(separationOfExtremes/sumOfExtremes < options$minRelativeSep))
+        if (isTRUE(abs(separationOfExtremes/sumOfExtremes) < options$minRelativeSep))
         {
             report(OL$Info, "Relative cost separation (", signif(separationOfExtremes/sumOfExtremes,3), ") is below threshold (", signif(options$minRelativeSep,3), ") - stopping")
             break
