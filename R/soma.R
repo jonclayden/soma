@@ -1,3 +1,22 @@
+bounds <- function (min, max)
+{
+    min <- as.numeric(min)
+    max <- as.numeric(max)
+    assert(length(min) == length(max), "Bounds are not of equal length")
+    assert(all(is.finite(min)) && all(is.finite(max)), "Bounds must be finite")
+    assert(all(min <= max), "At least one minimum is greater than the equivalent maximum", level=Warning)
+    assert(all(min != max), "At least one minimum and maximum bound are equal - consider making these fixed arguments to the cost function", level=Warning)
+    return (structure(list(min=min, max=max), class="soma.bounds"))
+}
+
+all2one <- function (pathLength = 3, stepLength = 0.11, perturbationChance = 0.1, minAbsoluteSep = 0, minRelativeSep = 1e-3, nMigrations = 20L, populationSize = 10L)
+{
+    assert(populationSize >= 2L, "Population size must be at least 2")
+    options <- list(strategy="all2one", pathLength=pathLength, stepLength=stepLength, perturbationChance=perturbationChance, minAbsoluteSep=minAbsoluteSep, minRelativeSep=minRelativeSep, nMigrations=nMigrations, populationSize=populationSize)
+    class(options) <- "soma.options"
+    return (options)
+}
+
 soma <- function (costFunction, bounds, options = list(), strategy = "all2one", ...)
 {
     if (!(all(c("min","max") %in% names(bounds))))
