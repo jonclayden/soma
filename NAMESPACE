@@ -1,4 +1,6 @@
 import(reportr)
 
 export(soma)
+export(bounds)
+export(all2one)
 S3method(plot, soma)

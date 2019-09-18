@@ -17,22 +17,13 @@ all2one <- function (pathLength = 3, stepLength = 0.11, perturbationChance = 0.1
     return (options)
 }
 
-soma <- function (costFunction, bounds, options = list(), strategy = "all2one", ...)
+soma <- function (costFunction, bounds, options = list(), ...)
 {
-    if (!(all(c("min","max") %in% names(bounds))))
-        report(OL$Error, "Bounds list must contain \"min\" and \"max\" vector elements")
-    if (length(bounds$min) != length(bounds$max))
-        report(OL$Error, "Bounds are not of equal length")
-    if (strategy != "all2one")
-        report(OL$Error, "Only the \"all2one\" strategy is currently supported")
-    
-    # Use defaults for unspecified options
-    defaultOptions <- list(pathLength=3, stepLength=0.11, perturbationChance=0.1, minAbsoluteSep=0, minRelativeSep=1e-3, nMigrations=20, populationSize=10)
-    defaultsNeeded <- setdiff(names(defaultOptions), names(options))
-    spuriousOptions <- setdiff(names(options), names(defaultOptions))
-    options[defaultsNeeded] <- defaultOptions[defaultsNeeded]
-    if (length(spuriousOptions) > 0)
-        report(OL$Warning, "The following options were specified but are not used: ", paste(spuriousOptions,collapse=", "))
+    # Check bounds and options
+    if (!inherits(bounds, "soma.bounds"))
+        bounds <- do.call(soma::bounds, bounds)
+    if (!inherits(options, "soma.options"))
+        options <- do.call(soma::all2one, options)
     
     nParams <- length(bounds$min)
     nParamsTotal <- nParams * options$populationSize
