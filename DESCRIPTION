@@ -10,3 +10,5 @@ Suggests: tinytest, covr
 Description: An R implementation of the Self-Organising Migrating Algorithm, a general-purpose, stochastic optimisation algorithm. The approach is similar to that of genetic algorithms, although it is based on the idea of a series of ``migrations'' by a fixed set of individuals, rather than the development of successive generations. It can be applied to any cost-minimisation problem with a bounded parameter space, and is robust to local minima.
 License: GPL-2
 URL: https://github.com/jonclayden/soma/, http://www.somaalgorithm.com/
+Encoding: UTF-8
+RoxygenNote: 6.1.1
