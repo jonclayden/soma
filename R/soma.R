@@ -26,7 +26,9 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
     population <- population * (bounds$max-bounds$min) + bounds$min
     
     # Calculate initial costs
-    costFunctionValues <- apply(population, 2, costFunction, ...)
+    evaluationCount <- 0
+    costFunctionWrapper <- function(x) { evaluationCount <<- evaluationCount + 1; costFunction(x, ...) }
+    costFunctionValues <- apply(population, 2, costFunctionWrapper)
     
     migrationCount <- 0
     leaderCostHistory <- numeric(0)
@@ -78,7 +80,7 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
         populationSteps[outOfBounds] <- randomSteps[outOfBounds]
         
         # Values over potential locations
-        costFunctionValues <- apply(populationSteps, 2:3, costFunction, ...)
+        costFunctionValues <- apply(populationSteps, 2:3, costFunctionWrapper)
         individualBestLocs <- apply(costFunctionValues, 1, which.min)
         
         # Migrate each individual to its best new location, and update costs
@@ -93,7 +95,7 @@ soma <- function (costFunction, bounds, options = list(), strategy = "all2one", 
     
     report(OL$Info, "Leader is #", leaderIndex, ", with cost ", signif(costFunctionValues[leaderIndex],3))
     
-    returnValue <- list(leader=leaderIndex, population=population, cost=costFunctionValues, history=leaderCostHistory, migrations=migrationCount)
+    returnValue <- list(leader=leaderIndex, population=population, cost=costFunctionValues, history=leaderCostHistory, migrations=migrationCount, evaluations=evaluationCount)
     class(returnValue) <- "soma"
     
     return (returnValue)
