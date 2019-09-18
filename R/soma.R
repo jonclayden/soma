@@ -202,8 +202,8 @@ bounds <- function (min, max)
     max <- as.numeric(max)
     assert(length(min) == length(max), "Bounds are not of equal length")
     assert(all(is.finite(min)) && all(is.finite(max)), "Bounds must be finite")
-    assert(all(min <= max), "At least one minimum is greater than the equivalent maximum", level=Warning)
-    assert(all(min != max), "At least one minimum and maximum bound are equal - consider making these fixed arguments to the cost function", level=Warning)
+    assert(all(min <= max), "At least one minimum is greater than the equivalent maximum", level=OL$Warning)
+    assert(all(min != max), "At least one minimum and maximum bound are equal - consider making these fixed arguments to the cost function", level=OL$Warning)
     return (structure(list(min=min, max=max), class="soma.bounds"))
 }
 
