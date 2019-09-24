@@ -11,9 +11,9 @@ values <- matrix(apply(expand.grid(locs,locs), 1, rastrigin), nrow=length(locs))
 # A helper function to plot the optimisation surface with additional annotations
 plotSurface <- function (title, annotExpr) {
     if (requireNamespace("shades", quietly=TRUE))
-        filled.contour(locs, locs, values, plot.axes={axis(1,-5:5); axis(2,-5:5); annotExpr}, plot.title=title(main=title), color.palette=shades::gradient("viridis"))
+        filled.contour(locs, locs, values, plot.axes={axis(1,-5:5); axis(2,-5:5); symbols(0,0,circles=0.15,inches=FALSE,fg="white",lwd=2,add=TRUE); text(0,0.35,"Optimum",col="white"); annotExpr}, plot.title=title(main=title), color.palette=shades::gradient("viridis"))
     else
-        filled.contour(locs, locs, values, plot.axes={axis(1,-5:5); axis(2,-5:5); annotExpr}, plot.title=title(main=title))
+        filled.contour(locs, locs, values, plot.axes={axis(1,-5:5); axis(2,-5:5); symbols(0,0,circles=0.15,inches=FALSE,fg="white",lwd=2,add=TRUE); text(0,0.35,"Optimum",col="white"); annotExpr}, plot.title=title(main=title))
 }
 
 # Use a fixed seed for reproducibility
