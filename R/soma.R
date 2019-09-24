@@ -117,7 +117,6 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
     nParamsTotal <- nParams * options$populationSize
     steps <- seq(0, options$pathLength, options$stepLength)
     nSteps <- length(steps)
-    steps <- rep(steps, each=nParamsTotal)
     
     # Create the population
     if (!is.null(init))
@@ -166,15 +165,26 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
         
         leaderCostHistory <- c(leaderCostHistory, leaderValue)
         
-        # Find the migration direction for each individual
-        directionsFromLeader <- apply(population, 2, "-", population[,leaderIndex])
+        # Establish which parameters will be changed, and which individuals will migrate
+        toPerturb <- array(runif(nParamsTotal) < options$perturbationChance, dim=dim(population))
+        toMigrate <- colSums(toPerturb) > 0
+        toMigrate[leaderIndex] <- FALSE
+        nMigrating <- sum(toMigrate)
         
-        # Establish which parameters will be changed
-        toPerturb <- runif(nParamsTotal) < options$perturbationChance
+        # No-op migrations aren't counted
+        if (nMigrating == 0)
+        {
+            report(OL$Verbose, "No parameters to perturb - skipping migration")
+            next
+        }
+        
+        # Find the migration direction for each individual
+        # NB: This form exploits recycling, which depends on the shape of "population" (params x individuals)
+        directionsFromLeader <- population[,toMigrate] - population[,leaderIndex]
         
         # Second line here has a minus because directions are away from leader
-        populationSteps <- array(rep(population,nSteps), dim=c(nParams,options$populationSize,nSteps))
-        populationSteps <- populationSteps - steps * rep(directionsFromLeader * toPerturb, nSteps)
+        populationSteps <- array(rep(population[,toMigrate],nSteps), dim=c(nParams,nMigrating,nSteps))
+        populationSteps <- populationSteps - rep(steps, each=nParams*nMigrating) * rep(directionsFromLeader * toPerturb[,toMigrate], nSteps)
         
         # Replace out-of-bounds parameters with random valid values
         outOfBounds <- which(populationSteps < bounds$min | populationSteps > bounds$max)
@@ -183,13 +193,15 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
         populationSteps[outOfBounds] <- randomSteps[outOfBounds]
         
         # Values over potential locations
-        costFunctionValues <- apply(populationSteps, 2:3, costFunctionWrapper)
-        individualBestLocs <- apply(costFunctionValues, 1, which.min)
+        allCostFunctionValues <- apply(populationSteps, 2:3, costFunctionWrapper)
+        individualBestLocs <- apply(allCostFunctionValues, 1, which.min)
         
         # Migrate each individual to its best new location, and update costs
-        indexingMatrix <- cbind(seq_len(options$populationSize), individualBestLocs)
-        population <- t(apply(populationSteps, 1, "[", indexingMatrix))
-        costFunctionValues <- costFunctionValues[indexingMatrix]
+        indexingMatrix <- cbind(seq_len(nMigrating), individualBestLocs)
+        subpopulation <- t(apply(populationSteps, 1, "[", indexingMatrix))
+        population[,toMigrate] <- subpopulation
+        bestCostFunctionValues <- allCostFunctionValues[indexingMatrix]
+        costFunctionValues[toMigrate] <- bestCostFunctionValues
         
         migrationCount <- migrationCount + 1
         if (migrationCount %% 10 == 0)
