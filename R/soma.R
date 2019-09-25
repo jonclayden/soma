@@ -9,6 +9,10 @@ NULL
 #' algorithm variants available in the package, which control how the algorithm
 #' will proceed and when it will terminate.
 #' 
+#' @param populationSize The number of individuals in the population. It is
+#'   recommended that this be somewhat larger than the number of parameters
+#'   being optimised over, and it should not be less than 2.
+#' @param nMigrations The maximum number of migrations to complete.
 #' @param pathLength The distance towards the leader that individuals may
 #'   migrate. A value of 1 corresponds to the leader's position itself, and
 #'   values greater than one (recommended) allow for some overshoot.
@@ -24,19 +28,24 @@ NULL
 #' @param minRelativeSep The smallest relative difference between the maximum
 #'   and minimum cost function values. If the difference falls below this
 #'   minimum, the algorithm will terminate.
-#' @param nMigrations The maximum number of migrations to complete.
-#' @param populationSize The number of individuals in the population. It is
-#'   recommended that this be somewhat larger than the number of parameters
-#'   being optimised over, and it should not be less than 2.
 #' @return A list of class \code{"soma.options"}.
 #' @author Jon Clayden <code@@clayden.org>
 #' @aliases soma.options
 #' @rdname soma.options
 #' @export
-all2one <- function (pathLength = 3, stepLength = 0.11, perturbationChance = 0.1, minAbsoluteSep = 0, minRelativeSep = 1e-3, nMigrations = 20L, populationSize = 10L)
+all2one <- function (populationSize = 10L, nMigrations = 20L, pathLength = 3, stepLength = 0.11, perturbationChance = 0.1, minAbsoluteSep = 0, minRelativeSep = 1e-3)
 {
     assert(populationSize >= 2L, "Population size must be at least 2")
-    options <- list(strategy="all2one", pathLength=pathLength, stepLength=stepLength, perturbationChance=perturbationChance, minAbsoluteSep=minAbsoluteSep, minRelativeSep=minRelativeSep, nMigrations=nMigrations, populationSize=populationSize)
+    options <- list(strategy="all2one", populationSize=populationSize, nMigrations=nMigrations, pathLength=pathLength, stepLength=stepLength, perturbationChance=perturbationChance, minAbsoluteSep=minAbsoluteSep, minRelativeSep=minRelativeSep)
+    class(options) <- "soma.options"
+    return (options)
+}
+
+t3a <- function (populationSize = 30L, nMigrations = 20L, nSteps = 45L, migrantPoolSize = 10L, leaderPoolSize = 10L, nMigrants = 4L, minAbsoluteSep = 0, minRelativeSep = 1e-3)
+{
+    assert(populationSize >= 2L, "Population size must be at least 2")
+    assert(nMigrants <= migrantPoolSize, "The number of migrants can't be larger than the migrant pool size")
+    options <- list(strategy="t3a", populationSize=populationSize, nMigrations=nMigrations, nSteps=nSteps, migrantPoolSize=migrantPoolSize, leaderPoolSize=leaderPoolSize, nMigrants=nMigrants, minAbsoluteSep=minAbsoluteSep, minRelativeSep=minRelativeSep)
     class(options) <- "soma.options"
     return (options)
 }
