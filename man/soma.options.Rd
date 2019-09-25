@@ -3,13 +3,24 @@
 \name{all2one}
 \alias{all2one}
 \alias{soma.options}
+\alias{t3a}
 \title{Options for the available SOMA variants}
 \usage{
-all2one(pathLength = 3, stepLength = 0.11, perturbationChance = 0.1,
-  minAbsoluteSep = 0, minRelativeSep = 0.001, nMigrations = 20L,
-  populationSize = 10L)
+all2one(populationSize = 10L, nMigrations = 20L, pathLength = 3,
+  stepLength = 0.11, perturbationChance = 0.1, minAbsoluteSep = 0,
+  minRelativeSep = 0.001)
+
+t3a(populationSize = 30L, nMigrations = 20L, nSteps = 45L,
+  migrantPoolSize = 10L, leaderPoolSize = 10L, nMigrants = 4L,
+  minAbsoluteSep = 0, minRelativeSep = 0.001)
 }
 \arguments{
+\item{populationSize}{The number of individuals in the population. It is
+recommended that this be somewhat larger than the number of parameters
+being optimised over, and it should not be less than 2.}
+
+\item{nMigrations}{The maximum number of migrations to complete.}
+
 \item{pathLength}{The distance towards the leader that individuals may
 migrate. A value of 1 corresponds to the leader's position itself, and
 values greater than one (recommended) allow for some overshoot.}
@@ -30,11 +41,17 @@ termination criterion will never be met.}
 and minimum cost function values. If the difference falls below this
 minimum, the algorithm will terminate.}
 
-\item{nMigrations}{The maximum number of migrations to complete.}
+\item{nSteps}{The number of candidate steps towards the leader per migrating
+individual. This option is used instead of \code{pathLength} and
+\code{stepLength} under the T3A strategy, since the step length is
+variable.}
 
-\item{populationSize}{The number of individuals in the population. It is
-recommended that this be somewhat larger than the number of parameters
-being optimised over, and it should not be less than 2.}
+\item{migrantPoolSize, leaderPoolSize}{The number of randomly selected
+individuals to include in the migrant and leader pools, respectively,
+under the T3A strategy.}
+
+\item{nMigrants}{The number of individuals that will migrate, at each
+migration, under the T3A strategy.}
 }
 \value{
 A list of class \code{"soma.options"}.

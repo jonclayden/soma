@@ -28,6 +28,15 @@ NULL
 #' @param minRelativeSep The smallest relative difference between the maximum
 #'   and minimum cost function values. If the difference falls below this
 #'   minimum, the algorithm will terminate.
+#' @param nSteps The number of candidate steps towards the leader per migrating
+#'   individual. This option is used instead of \code{pathLength} and
+#'   \code{stepLength} under the T3A strategy, since the step length is
+#'   variable.
+#' @param migrantPoolSize,leaderPoolSize The number of randomly selected
+#'   individuals to include in the migrant and leader pools, respectively,
+#'   under the T3A strategy.
+#' @param nMigrants The number of individuals that will migrate, at each
+#'   migration, under the T3A strategy.
 #' @return A list of class \code{"soma.options"}.
 #' @author Jon Clayden <code@@clayden.org>
 #' @aliases soma.options
@@ -41,6 +50,8 @@ all2one <- function (populationSize = 10L, nMigrations = 20L, pathLength = 3, st
     return (options)
 }
 
+#' @rdname soma.options
+#' @export
 t3a <- function (populationSize = 30L, nMigrations = 20L, nSteps = 45L, migrantPoolSize = 10L, leaderPoolSize = 10L, nMigrants = 4L, minAbsoluteSep = 0, minRelativeSep = 1e-3)
 {
     assert(populationSize >= 2L, "Population size must be at least 2")
