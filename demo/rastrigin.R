@@ -1,7 +1,7 @@
-# Rastrigin's function (in 2D), which contains many local minima
-rastrigin <- function (a) 20 + a[1]^2 + a[2]^2 - 10*(cos(2*pi*a[1])+cos(2*pi*a[2]))
+# Rastrigin's function, which contains many local minima
+rastrigin <- function (x) 10 * length(x) + sum(x^2 - 10 * cos(2*pi*x))
 
-# Search space
+# Search space (in 2D)
 bounds <- bounds(c(-5,-5), c(5,5))
 
 # Evaluate the function on a grid, for background plotting
