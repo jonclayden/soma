@@ -61,6 +61,8 @@ t3a <- function (populationSize = 30L, nMigrations = 20L, nSteps = 45L, migrantP
     return (options)
 }
 
+"%||%" <- function (X, Y) { if (is.null(X)) Y else X }
+
 #' The Self-Organising Migrating Algorithm
 #' 
 #' The Self-Organising Migrating Algorithm is a general-purpose, stochastic
@@ -135,8 +137,10 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
     
     nParams <- length(bounds$min)
     nParamsTotal <- nParams * options$populationSize
-    steps <- seq(0, options$pathLength, options$stepLength)
-    nSteps <- length(steps)
+    if (!is.null(options$pathLength) && !is.null(options$stepLength))
+        steps <- seq(0, options$pathLength, options$stepLength)
+    nSteps <- options$nSteps %||% length(steps)
+    perturbationChance <- options$perturbationChance %||% 1
     
     # Create the population
     if (!is.null(init))
@@ -159,36 +163,51 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
     
     repeat
     {
-        # Find the current leader
-        leaderIndex <- which.min(costFunctionValues)
-        leaderValue <- costFunctionValues[leaderIndex]
-        separationOfExtremes <- max(costFunctionValues) - leaderValue
-        sumOfExtremes <- max(costFunctionValues) + leaderValue
+        if (options$strategy == "all2one")
+        {
+            # Find the current leader
+            leader <- which.min(costFunctionValues)
+            migrants <- seq_len(options$populationSize)
+        }
+        else if (options$strategy == "t3a")
+        {
+            perturbationChance <- 0.05 + 0.9 * (migrationCount / options$nMigrations)
+            steps <- (seq_len(nSteps)-1) * (0.15 - 0.08 * (migrationCount / options$nMigrations))
+            leaderPool <- sample(options$populationSize, options$leaderPoolSize)
+            leader <- leaderPool[which.min(costFunctionValues[leaderPool])]
+            migrantPool <- sample(options$populationSize, options$migrantPoolSize)
+            migrants <- migrantPool[sort(costFunctionValues[migrantPool],index.return=TRUE)$ix[seq_len(options$nMigrants)]]
+        }
+        
+        leaderValue <- costFunctionValues[leader]
+        separationOfExtremes <- max(costFunctionValues) - min(costFunctionValues)
+        sumOfExtremes <- max(costFunctionValues) + min(costFunctionValues)
         
         # Check termination criteria
         if (migrationCount == options$nMigrations)
         {
-            report(OL$Info, "Migration limit (", options$nMigrations, ") reached - stopping")
+            report(OL$Info, "Migration limit (#{options$nMigrations}) reached - stopping")
             break
         }
         if (separationOfExtremes < options$minAbsoluteSep)
         {
-            report(OL$Info, "Absolute cost separation (", signif(separationOfExtremes,3), ") is below threshold (", signif(options$minAbsoluteSep,3), ") - stopping")
+            report(OL$Info, "Absolute cost separation (#{separationOfExtremes}) is below threshold (#{options$minAbsoluteSep}) - stopping", signif=3)
             break
         }
         # isTRUE() needed here in case extremes are infinite: Inf/Inf => NaN
         if (isTRUE(abs(separationOfExtremes/sumOfExtremes) < options$minRelativeSep))
         {
-            report(OL$Info, "Relative cost separation (", signif(separationOfExtremes/sumOfExtremes,3), ") is below threshold (", signif(options$minRelativeSep,3), ") - stopping")
+            report(OL$Info, "Relative cost separation (#{separationOfExtremes/sumOfExtremes}) is below threshold (#{options$minRelativeSep}) - stopping", signif=3)
             break
         }
         
         leaderCostHistory <- c(leaderCostHistory, leaderValue)
         
         # Establish which parameters will be changed, and which individuals will migrate
-        toPerturb <- array(runif(nParamsTotal) < options$perturbationChance, dim=dim(population))
+        toPerturb <- array(FALSE, dim=dim(population))
+        toPerturb[,migrants] <- runif(nParams * length(migrants)) < perturbationChance
         toMigrate <- colSums(toPerturb) > 0
-        toMigrate[leaderIndex] <- FALSE
+        toMigrate[leader] <- FALSE
         nMigrating <- sum(toMigrate)
         
         # No-op migrations aren't counted
@@ -200,7 +219,7 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
         
         # Find the migration direction for each individual
         # NB: This form exploits recycling, which depends on the shape of "population" (params x individuals)
-        directionsFromLeader <- population[,toMigrate] - population[,leaderIndex]
+        directionsFromLeader <- population[,toMigrate] - population[,leader]
         
         # Second line here has a minus because directions are away from leader
         populationSteps <- array(rep(population[,toMigrate],nSteps), dim=c(nParams,nMigrating,nSteps))
@@ -228,9 +247,10 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
             report(OL$Verbose, "Completed ", migrationCount, " migrations")
     }
     
-    report(OL$Info, "Leader is #", leaderIndex, ", with cost ", signif(costFunctionValues[leaderIndex],3))
+    leader <- which.min(costFunctionValues)
+    report(OL$Info, "Final leader is ##{leader}, with cost #{costFunctionValues[leader]}", signif=3)
     
-    returnValue <- list(leader=leaderIndex, population=population, cost=costFunctionValues, history=leaderCostHistory, migrations=migrationCount, evaluations=evaluationCount)
+    returnValue <- list(leader=leader, population=population, cost=costFunctionValues, history=leaderCostHistory, migrations=migrationCount, evaluations=evaluationCount)
     class(returnValue) <- "soma"
     
     return (returnValue)
