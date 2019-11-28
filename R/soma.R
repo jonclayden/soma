@@ -245,6 +245,8 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
             report(OL$Verbose, "No parameters to perturb - skipping migration")
             next
         }
+        else
+            report(OL$Verbose, "Migration ##{migrationCount+1}: #{nMigrating} individuals moving towards leader ##{leader} with cost #{leaderValue}", signif=3)
         
         # Find the migration direction for each individual
         # NB: This form exploits recycling, which depends on the shape of "population" (params x individuals)
