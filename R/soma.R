@@ -61,6 +61,16 @@ t3a <- function (populationSize = 30L, nMigrations = 20L, nSteps = 45L, migrantP
     return (options)
 }
 
+#' @rdname soma.options
+#' @export
+pareto <- function (populationSize = 100L, nMigrations = 20L, nSteps = 10L, perturbationFrequency = 1, stepFrequency = 1, minAbsoluteSep = 0, minRelativeSep = 1e-3)
+{
+    assert(populationSize >= 2L, "Population size must be at least 2")
+    options <- list(strategy="pareto", populationSize=populationSize, nMigrations=nMigrations, nSteps=nSteps, perturbationFrequency=perturbationFrequency, stepFrequency=stepFrequency, minAbsoluteSep=minAbsoluteSep, minRelativeSep=minRelativeSep)
+    class(options) <- "soma.options"
+    return (options)
+}
+
 "%||%" <- function (X, Y) { if (is.null(X)) Y else X }
 
 #' The Self-Organising Migrating Algorithm
@@ -142,6 +152,13 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
     nSteps <- options$nSteps %||% length(steps)
     perturbationChance <- options$perturbationChance %||% 1
     
+    leaderPoolIndices <- migrantPoolIndices <- NULL
+    if (options$strategy == "pareto")
+    {
+        leaderPoolIndices <- seq_len(ceiling(options$populationSize / 25))
+        migrantPoolIndices <- seq_len(ceiling(options$populationSize / 6.25)) + round(options$populationSize / 5)
+    }
+    
     # Create the population
     if (!is.null(init))
         population <- init
@@ -163,6 +180,8 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
     
     repeat
     {
+        progress <- migrationCount / options$nMigrations
+        
         if (options$strategy == "all2one")
         {
             # Find the current leader
@@ -171,12 +190,20 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
         }
         else if (options$strategy == "t3a")
         {
-            perturbationChance <- 0.05 + 0.9 * (migrationCount / options$nMigrations)
-            steps <- (seq_len(nSteps)-1) * (0.15 - 0.08 * (migrationCount / options$nMigrations))
+            perturbationChance <- 0.05 + 0.9 * progress
+            steps <- (seq_len(nSteps)-1) * (0.15 - 0.08 * progress)
             leaderPool <- sample(options$populationSize, options$leaderPoolSize)
             leader <- leaderPool[which.min(costFunctionValues[leaderPool])]
             migrantPool <- sample(options$populationSize, options$migrantPoolSize)
-            migrants <- migrantPool[sort(costFunctionValues[migrantPool],index.return=TRUE)$ix[seq_len(options$nMigrants)]]
+            migrants <- migrantPool[order(costFunctionValues[migrantPool])[seq_len(options$nMigrants)]]
+        }
+        else if (options$strategy == "pareto")
+        {
+            perturbationChance <- 0.5 + 0.45 * cos(options$perturbationFrequency * pi * progress + pi)
+            steps <- (seq_len(nSteps)-1) * (0.35 + 0.15 * cos(options$stepFrequency * pi * progress))
+            order <- order(costFunctionValues)
+            leader <- sample(order[leaderPoolIndices], 1)
+            migrants <- sample(order[migrantPoolIndices], 1)
         }
         
         leaderValue <- costFunctionValues[leader]
@@ -206,6 +233,8 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
         # Establish which parameters will be changed, and which individuals will migrate
         toPerturb <- array(FALSE, dim=dim(population))
         toPerturb[,migrants] <- runif(nParams * length(migrants)) < perturbationChance
+        if (options$strategy == "pareto")
+            toPerturb[,migrants] <- ifelse(toPerturb[,migrants], 1, progress)
         toMigrate <- colSums(toPerturb) > 0
         toMigrate[leader] <- FALSE
         nMigrating <- sum(toMigrate)
