@@ -169,6 +169,7 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
     }
     
     # Calculate initial costs
+    evaluations <- NULL
     evaluationCount <- 0
     costFunctionWrapper <- function(x) { evaluationCount <<- evaluationCount + 1; costFunction(x, ...) }
     costFunctionValues <- apply(population, 2, costFunctionWrapper)
@@ -228,8 +229,6 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
             break
         }
         
-        leaderCostHistory <- c(leaderCostHistory, leaderValue)
-        
         # Establish which parameters will be changed, and which individuals will migrate
         toPerturb <- array(FALSE, dim=dim(population))
         toPerturb[,migrants] <- runif(nParams * length(migrants)) < perturbationChance
@@ -274,14 +273,14 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
         costFunctionValues[toMigrate] <- bestCostFunctionValues
         
         migrationCount <- migrationCount + 1
-        if (migrationCount %% 10 == 0)
-            report(OL$Verbose, "Completed ", migrationCount, " migrations")
+        evaluations <- c(evaluations, evaluationCount)
+        leaderCostHistory <- c(leaderCostHistory, min(costFunctionValues))
     }
     
     leader <- which.min(costFunctionValues)
     report(OL$Info, "Final leader is ##{leader}, with cost #{costFunctionValues[leader]}", signif=3)
     
-    returnValue <- list(leader=leader, population=population, cost=costFunctionValues, history=leaderCostHistory, migrations=migrationCount, evaluations=evaluationCount)
+    returnValue <- list(leader=leader, population=population, cost=costFunctionValues, history=leaderCostHistory, migrations=migrationCount, evaluations=evaluations)
     class(returnValue) <- "soma"
     
     return (returnValue)
