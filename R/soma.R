@@ -352,5 +352,5 @@ plot.soma <- function (x, y = NULL, add = FALSE, ...)
     if (add)
         points(x$evaluations, x$history, type="b", ...)
     else
-        plot(x$evaluations, x$history, xlab="Migration number", ylab="Leader cost value", type="b", ...)
+        plot(x$evaluations, x$history, xlab="Cost function evaluations", ylab="Leader cost value", type="b", ...)
 }
