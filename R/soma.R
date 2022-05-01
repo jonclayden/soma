@@ -109,7 +109,7 @@ pareto <- function (populationSize = 100L, nMigrations = 20L, nSteps = 10L, pert
     return (options)
 }
 
-"%||%" <- function (X, Y) { if (is.null(X)) Y else X }
+"%||%" <- function (X, Y) { if (is.null(X) || length(X)==0) Y else X }
 
 #' The Self-Organising Migrating Algorithm
 #' 
