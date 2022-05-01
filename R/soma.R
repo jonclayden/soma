@@ -207,13 +207,13 @@ soma <- function (costFunction, bounds, options = list(), init = NULL, ...)
     }
     
     # Calculate initial costs
-    evaluations <- NULL
+    evaluations <- 0
     evaluationCount <- 0
     costFunctionWrapper <- function(x) { evaluationCount <<- evaluationCount + 1; costFunction(x, ...) }
     costFunctionValues <- apply(population, 2, costFunctionWrapper)
     
     migrationCount <- 0
-    leaderCostHistory <- numeric(0)
+    leaderCostHistory <- min(costFunctionValues)
     
     report(OL$Info, "Starting SOMA optimisation")
     
