@@ -4,20 +4,45 @@
 \alias{all2one}
 \alias{soma.options}
 \alias{t3a}
+\alias{pareto}
 \title{Options for the available SOMA variants}
 \usage{
-all2one(populationSize = 10L, nMigrations = 20L, pathLength = 3,
-  stepLength = 0.11, perturbationChance = 0.1, minAbsoluteSep = 0,
-  minRelativeSep = 0.001)
+all2one(
+  populationSize = 10L,
+  nMigrations = 20L,
+  pathLength = 3,
+  stepLength = 0.11,
+  perturbationChance = 0.1,
+  minAbsoluteSep = 0,
+  minRelativeSep = 0.001
+)
 
-t3a(populationSize = 30L, nMigrations = 20L, nSteps = 45L,
-  migrantPoolSize = 10L, leaderPoolSize = 10L, nMigrants = 4L,
-  minAbsoluteSep = 0, minRelativeSep = 0.001)
+t3a(
+  populationSize = 30L,
+  nMigrations = 20L,
+  nSteps = 45L,
+  migrantPoolSize = 10L,
+  leaderPoolSize = 10L,
+  nMigrants = 4L,
+  minAbsoluteSep = 0,
+  minRelativeSep = 0.001
+)
+
+pareto(
+  populationSize = 100L,
+  nMigrations = 20L,
+  nSteps = 10L,
+  perturbationFrequency = 1,
+  stepFrequency = 1,
+  minAbsoluteSep = 0,
+  minRelativeSep = 0.001
+)
 }
 \arguments{
 \item{populationSize}{The number of individuals in the population. It is
 recommended that this be somewhat larger than the number of parameters
-being optimised over, and it should not be less than 2.}
+being optimised over, and it should not be less than 2. The default varies
+by strategy.}
 
 \item{nMigrations}{The maximum number of migrations to complete.}
 
@@ -43,8 +68,8 @@ minimum, the algorithm will terminate.}
 
 \item{nSteps}{The number of candidate steps towards the leader per migrating
 individual. This option is used instead of \code{pathLength} and
-\code{stepLength} under the T3A strategy, since the step length is
-variable.}
+\code{stepLength} under the T3A and Pareto strategies, where the step
+length is variable.}
 
 \item{migrantPoolSize, leaderPoolSize}{The number of randomly selected
 individuals to include in the migrant and leader pools, respectively,
@@ -52,6 +77,10 @@ under the T3A strategy.}
 
 \item{nMigrants}{The number of individuals that will migrate, at each
 migration, under the T3A strategy.}
+
+\item{perturbationFrequency, stepFrequency}{Scale factors affecting how
+rapidly the perturbation probability and step sizes fluctuate under the
+Pareto strategy.}
 }
 \value{
 A list of class \code{"soma.options"}.
@@ -59,7 +88,49 @@ A list of class \code{"soma.options"}.
 \description{
 These functions generate option lists (and provide defaults) for the SOMA
 algorithm variants available in the package, which control how the algorithm
-will proceed and when it will terminate.
+will proceed and when it will terminate. Each function corresponds to a
+different top-level strategy, described in a different reference.
+}
+\details{
+All To One (the \code{all2one} function) is the original SOMA strategy. At
+each ``migration'', the cost function is evaluated for all individuals in
+the population, and the one with the lowest value is designated the
+``leader''. All other individuals migrate towards the leader's position in
+some or all dimensions of the parameter space, with a fixed probability of
+perturbation in each dimension. Each migration is evaluated against the cost
+function at several points on the line towards the leader, and the location
+with the lowest value becomes the individual's starting position for the
+next migration.
+
+The Team To Team Adaptive (T3A) strategy (Diep, 2019) differs in that only a
+random subset of individuals are selected into a migrant pool and a leader
+pool for any given migration. A subset of most optimal migrants are then
+migrated towards the single most optimal individual from the leader pool.
+The perturbation probability and step length along the trajectory towards
+the leader also vary according to formulae given by the strategy author as
+the algorithm progresses through the migrations.
+
+In the Pareto strategy (Diep et al., 2019), all individuals are sorted by
+cost function value at the start of each migration. The leader is selected
+randomly from the top 4\% (20\% of 20\%) of most optimal individuals, and
+a single migrant is chosen at random from between the 20th and the 36th
+percentiles of the population (the top 20\% of the bottom 80\%). The
+perturbation probability and the step length again vary across migrations,
+but this time in a sinusoidal fashion, and the migrant is updated in all
+dimensions, but some more slowly than others.
+}
+\references{
+I. Zelinka (2004). SOMA - self-organizing migrating algorithm. In G.C.
+  Onwubolu & B.V. Babu, eds, New optimization techniques in engineering.
+  Volume 141 of ``Studies in Fuzziness and Soft Computing'', pp. 167-217.
+  Springer.
+  
+  Q.B. Diep (2019). Self-Organizing Migrating Algorithm Team To Team
+  Adaptive – SOMA T3A. In proceedings of the 2019 IEEE Congress on
+  Evolutionary Computation (CEC), pp. 1182-1187. IEEE.
+  
+  Q.B. Diep, I. Zelinka & S. Das (2019). Pareto-Based Self-Organizing
+  Migrating Algorithm. Mendel 25(1):111-120.
 }
 \author{
 Jon Clayden <code@clayden.org>

@@ -1,5 +1,5 @@
 #' @import reportr
-#' @importFrom graphics plot
+#' @importFrom graphics plot points
 #' @importFrom stats runif
 NULL
 
@@ -59,13 +59,16 @@ NULL
 #'   minimum, the algorithm will terminate.
 #' @param nSteps The number of candidate steps towards the leader per migrating
 #'   individual. This option is used instead of \code{pathLength} and
-#'   \code{stepLength} under the T3A strategy, since the step length is
-#'   variable.
+#'   \code{stepLength} under the T3A and Pareto strategies, where the step
+#'   length is variable.
 #' @param migrantPoolSize,leaderPoolSize The number of randomly selected
 #'   individuals to include in the migrant and leader pools, respectively,
 #'   under the T3A strategy.
 #' @param nMigrants The number of individuals that will migrate, at each
 #'   migration, under the T3A strategy.
+#' @param perturbationFrequency,stepFrequency Scale factors affecting how
+#'   rapidly the perturbation probability and step sizes fluctuate under the
+#'   Pareto strategy.
 #' @return A list of class \code{"soma.options"}.
 #' @references
 #'   I. Zelinka (2004). SOMA - self-organizing migrating algorithm. In G.C.
@@ -73,8 +76,12 @@ NULL
 #'   Volume 141 of ``Studies in Fuzziness and Soft Computing'', pp. 167-217.
 #'   Springer.
 #'   
-#'   Q. B. Diep (2019). Self-Organizing Migrating Algorithm Team To Team
-#'   Adaptive – SOMA T3A. 
+#'   Q.B. Diep (2019). Self-Organizing Migrating Algorithm Team To Team
+#'   Adaptive – SOMA T3A. In proceedings of the 2019 IEEE Congress on
+#'   Evolutionary Computation (CEC), pp. 1182-1187. IEEE.
+#'   
+#'   Q.B. Diep, I. Zelinka & S. Das (2019). Pareto-Based Self-Organizing
+#'   Migrating Algorithm. Mendel 25(1):111-120.
 #'   
 #' @author Jon Clayden <code@@clayden.org>
 #' @aliases soma.options
@@ -113,12 +120,12 @@ pareto <- function (populationSize = 100L, nMigrations = 20L, nSteps = 10L, pert
 
 #' The Self-Organising Migrating Algorithm
 #' 
-#' The Self-Organising Migrating Algorithm is a general-purpose, stochastic
-#' optimisation algorithm. The approach is similar to that of genetic
-#' algorithms, although it is based on the idea of a series of ``migrations''
-#' by a fixed set of individuals, rather than the development of successive
-#' generations. It can be applied to any cost-minimisation problem with a
-#' bounded parameter space, and is robust to local minima.
+#' The Self-Organising Migrating Algorithm (SOMA) is a general-purpose,
+#' stochastic optimisation algorithm. The approach is similar to that of
+#' genetic algorithms, although it is based on the idea of a series of
+#' ``migrations'' by a fixed set of individuals, rather than the development
+#' of successive generations. It can be applied to any cost-minimisation
+#' problem with a bounded parameter space, and is robust to local minima.
 #' 
 #' @param costFunction A cost function which takes a numeric vector of
 #'   parameters as its first argument, and returns a numeric scalar
@@ -138,6 +145,7 @@ pareto <- function (populationSize = 100L, nMigrations = 20L, nSteps = 10L, pert
 #'   or the default plotting method (for \code{plot.soma}).
 #' @param x An object of class \code{"soma"}.
 #' @param y Ignored.
+#' @param add If \code{TRUE}, add to an existing plot canvas.
 #' @return A list of class \code{"soma"}, containing the following elements.
 #'   \describe{
 #'     \item{leader}{The index of the ``leader'', the individual in the
@@ -156,7 +164,7 @@ pareto <- function (populationSize = 100L, nMigrations = 20L, nSteps = 10L, pert
 #'     of leader cost values during the optimisation.
 #' @examples
 #' # Rastrigin's function, which contains many local minima
-#' rastrigin <- function (a) 20 + a[1]^2 + a[2]^2 - 10*(cos(2*pi*a[1])+cos(2*pi*a[2]))
+#' rastrigin <- function (x) 10 * length(x) + sum(x^2 - 10 * cos(2*pi*x))
 #' 
 #' # Find the global minimum over the range -5 to 5 in each parameter
 #' x <- soma(rastrigin, bounds(c(-5,-5), c(5,5)))
