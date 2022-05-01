@@ -2,6 +2,24 @@ Significant changes to the soma package are laid out below for each release.
 
 =================================================================================
 
+VERSION 1.2.0
+
+- New T3A and Pareto strategies are now available, using helper functions for
+  generating options, instead of the (previously unused and now defunct)
+  "strategy" argument to `soma()`. See `?soma.options` for details of the new
+  strategy types, their options and further references.
+- Cost function evaluations are now counted and recorded in the `evaluations`
+  element of `soma` objects. This is now used in the `plot()` method rather
+  than just migration number.
+- It is now possible to initialise the population explicitly, rather than at
+  random.
+- The code now tries much harder to avoid re-evaluating the cost function when
+  individuals aren't moving in a given migration. This can save a lot of time
+  when the objective is very expensive to calculate.
+- A visual demo is now included with the package: try `demo(rastrigin)`.
+
+=================================================================================
+
 VERSION 1.1.1
 
 - A short README file has been added to the package.
