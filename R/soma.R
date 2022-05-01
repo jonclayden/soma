@@ -339,7 +339,10 @@ bounds <- function (min, max)
 
 #' @rdname soma
 #' @export
-plot.soma <- function (x, y = NULL, ...)
+plot.soma <- function (x, y = NULL, add = FALSE, ...)
 {
-    plot(seq_along(x$history), x$history, xlab="Migration number", ylab="Leader cost value", type="b", ...)
+    if (add)
+        points(x$evaluations, x$history, type="b", ...)
+    else
+        plot(x$evaluations, x$history, xlab="Migration number", ylab="Leader cost value", type="b", ...)
 }
