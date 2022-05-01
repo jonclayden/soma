@@ -1,4 +1,8 @@
-
+```{r, echo=FALSE}
+knitr::opts_chunk$set(collapse=TRUE, fig.path="tools/figures/", dpi=150)
+options(reportrPrefixFormat="")
+reportr::setOutputLevel(Info)
+```
 
 [![CRAN version](http://www.r-pkg.org/badges/version/RNifti)](https://cran.r-project.org/package=RNifti)
 
@@ -16,8 +20,7 @@ The `soma()` function provides the R interface to the SOMA algorithm. It is call
 
 As an example, consider the two-dimensional version of [Rastrigin's function](https://en.wikipedia.org/wiki/Rastrigin_function), which has many local minima, and a global minimum of zero at (0,0).
 
-
-```r
+```{r}
 rastrigin <- function(a) 20 + a[1]^2 + a[2]^2 - 10*(cos(2*pi*a[1])+cos(2*pi*a[2]))
 ```
 
@@ -27,31 +30,22 @@ The function surface looks like this (image from Wikimedia Commons):
 
 We can attempt to find the global minimum with the call
 
-
-```r
+```{r}
 library(soma)
 r <- soma(rastrigin, bounds(min=c(-5.12,-5.12),max=c(5.12,5.12)))
-## Starting SOMA optimisation
-## Migration limit (20) reached - stopping
-## Final leader is #2, with cost 0.000348
 ```
 
 We can see in the informative output what the lowest cost function value found by the algorithm was on this run, and how it compares to the tru minimum of zero. The location in search space of the obtained minimum is
 
-
-```r
+```{r}
 print(r$population[,r$leader])
-## [1] -0.0008568434  0.0010108585
 ```
 
 Finally, we can plot how the optimisation progressed, showing the best cost function value at each migration:
 
-
-```r
+```{r}
 plot(r, log="y")
 ```
-
-![plot of chunk unnamed-chunk-5](tools/figures/unnamed-chunk-5-1.png)
 
 Note that there is a monotonic decrease in the cost function value of the "leader"—the individual with the lowest value—throughout.
 
