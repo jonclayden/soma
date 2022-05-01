@@ -1,6 +1,6 @@
 
 
-[![CRAN version](http://www.r-pkg.org/badges/version/RNifti)](https://cran.r-project.org/package=RNifti)
+[![CRAN version](http://www.r-pkg.org/badges/version/soma)](https://cran.r-project.org/package=soma)
 
 # General-purpose optimisation with SOMA
 
